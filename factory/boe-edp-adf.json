@@ -1,0 +1,9 @@
+{
+	"name": "boe-edp-adf",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "0dcf6e32-5531-448d-8a90-eb19ceb7dd85",
+		"tenantId": "3e0088dc-0629-4ae6-aa8c-813e7a296f50"
+	}
+}
