@@ -2,7 +2,7 @@
 	"name": "boe-edp-adf",
 	"properties": {
 		"globalConfigurations": {
-			"PolicyValidationEnabled": "true"
+			"PolicyValidationEnabled": "false"
 		}
 	},
 	"location": "uksouth",
