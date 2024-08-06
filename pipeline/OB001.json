@@ -4,48 +4,11 @@
 		"description": "This pipeline run and execute SPs .",
 		"activities": [
 			{
-				"name": "Retrieve Config for OB001",
-				"description": "Retrieving config info for OB001 to execute sps",
-				"type": "Lookup",
-				"dependsOn": [],
-				"policy": {
-					"retry": 3,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "SELECT * FROM stage.ADF_Config where Spec_Code = '@{pipeline().parameters.speccode}' ",
-							"type": "Expression"
-						},
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "DS_ASQL",
-						"type": "DatasetReference"
-					},
-					"firstRowOnly": false
-				},
-				"linkedServiceName": {
-					"referenceName": "LS_ASQL",
-					"type": "LinkedServiceReference"
-				},
-				"outputs": [
-					{
-						"name": "Configuration"
-					}
-				]
-			},
-			{
 				"name": "ForEach Table",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Retrieve Config for OB001",
+						"activity": "lkp_control_metadata",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -54,134 +17,75 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Retrieve Config for OB001').output.value",
+						"value": "@activity('lkp_control_metadata').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "If Condition1",
-							"type": "IfCondition",
-							"dependsOn": [
-								{
-									"activity": "Get Source Name",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "Get WhereCondition",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"name": "Get Metadata1",
+							"type": "GetMetadata",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"expression": {
-									"value": "@equals(item().Operation,'upsert')",
-									"type": "Expression"
+								"dataset": {
+									"referenceName": "ds_source",
+									"type": "DatasetReference"
 								},
-								"ifFalseActivities": [
-									{
-										"name": "OB1001 Execute SQL",
-										"type": "Script",
-										"dependsOn": [],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"linkedServiceName": {
-											"referenceName": "LS_ASQL",
-											"type": "LinkedServiceReference"
-										},
-										"typeProperties": {
-											"scripts": [
-												{
-													"type": "NonQuery",
-													"text": {
-														"value": "update @{variables('Source_Name')}  \n set status = 'Expired' \n where @{variables('Where_Condition')}            \n ",
-														"type": "Expression"
-													}
-												}
-											],
-											"scriptBlockExecutionTimeout": "02:00:00"
-										}
-									}
+								"fieldList": [
+									"childItems"
 								],
-								"ifTrueActivities": [
-									{
-										"name": "Stored procedure",
-										"type": "SqlServerStoredProcedure",
-										"dependsOn": [],
-										"policy": {
-											"timeout": "0.12:00:00",
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"storedProcedureName": {
-												"value": "@variables('Source_Name')",
-												"type": "Expression"
-											}
-										},
-										"linkedServiceName": {
-											"referenceName": "LS_ASQL",
-											"type": "LinkedServiceReference"
-										}
-									}
-								]
-							}
-						},
-						{
-							"name": "Get Source Name",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "Source_Name",
-								"value": {
-									"value": "@item().Source_Name",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Get WhereCondition",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "Where_Condition",
-								"value": {
-									"value": "@item().Where_Condition",
-									"type": "Expression"
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
 								}
 							}
 						}
 					]
 				}
+			},
+			{
+				"name": "lkp_control_metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "Select * FROM config.ControlMetadataMock",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_control_metadata",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
 			}
 		],
 		"parameters": {
-			"speccode": {
-				"type": "String",
-				"defaultValue": "OB001"
+			"DataSource": {
+				"type": "array"
 			}
 		},
 		"variables": {

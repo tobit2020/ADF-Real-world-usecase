@@ -1,0 +1,100 @@
+{
+	"name": "ds_control_metadata",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lk_control_metadata",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SourceType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceFilePath",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FileFormat",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceConnectionStringSecretName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceStorageAccount",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceContainer",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceDirectoryPath",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceFileName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceLinkedService",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceDataset",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationConnectionStringSecretName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationStorageAccount",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationContainer",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationDirectoryPath",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationFileName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationLinkedService",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationSourceDataset",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsActive",
+				"type": "bit"
+			},
+			{
+				"name": "LastModified",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "config",
+			"table": "ControlMetadataMock"
+		}
+	}
+}
